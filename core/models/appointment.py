@@ -9,3 +9,5 @@ class Appointment(Base):
     age = Column(Integer, nullable=False)
     symptoms = Column(String, nullable=False)
     specialist = Column(String, nullable=False)
+
+

@@ -16,5 +16,13 @@ export const uploadVoice = async (file) => {
 };
 
 export const createAppointment = async (data) => {
-  return await API.post('/appointments/create', data);
+  return await API.post('/appointments/create', data); // ✅ match the FastAPI route
+};
+
+export const signup = async (userData) => {
+  return await API.post('/users/signup', userData);  // ✅ Correct path
+};
+
+export const login = async (data) => {
+  return await API.post('/users/login', data);
 };

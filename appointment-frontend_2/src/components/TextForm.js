@@ -1,13 +1,13 @@
 // src/components/TextForm.js
 import React, { useState } from 'react';
-import { createAppointment } from '../api';
+import { createAppointment, createAppointment2 } from '../api';
 
 const TextForm = ({ onResult }) => {
   const [form, setForm] = useState({
     patient_name: '',
     age: '',
     symptoms: '',
-    preferred_doctor: '',
+    specialist: '',
   });
 
   const handleChange = (e) => {
@@ -73,11 +73,11 @@ const TextForm = ({ onResult }) => {
             <label className="form-label">Preferred Doctor</label>
             <input
               type="text"
-              name="preferred_doctor"
+              name="specialist"
               className="form-control"
               placeholder="Optional: e.g. Cardiologist"
               onChange={handleChange}
-              value={form.preferred_doctor}
+              value={form.specialist}
             />
           </div>
 

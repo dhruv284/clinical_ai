@@ -2,22 +2,25 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from core.database import engine
 from core.models.appointment import Appointment
-from routes import appointments
+from core.models.user import User
+from routes import appointments, users
 
-# Create tables
-Appointment.__table__.create(bind=engine, checkfirst=True)
-
-# Create FastAPI app
+# Create FastAPI app first
 app = FastAPI()
 
-# ✅ Enable CORS for frontend at http://localhost:3000
+# ✅ Enable CORS BEFORE including any routers
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # Only allow frontend
+    allow_origins=["http://localhost:3000"],  # React frontend
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Register appointment routes
+# Create tables
+Appointment.__table__.create(bind=engine, checkfirst=True)
+User.__table__.create(bind=engine, checkfirst=True)
+
+# Register routers
 app.include_router(appointments.router)
+app.include_router(users.router)

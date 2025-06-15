@@ -6,6 +6,7 @@ import axios from 'axios';
 function VoiceRecorder({ onResult }) {
   const [recording, setRecording] = useState(false);
   const [blobURL, setBlobURL] = useState(null);
+  const [responseData, setResponseData] = useState(null);
   const audioContextRef = useRef(null);
   const recorderRef = useRef(null);
   const audioStreamRef = useRef(null);
@@ -18,11 +19,12 @@ function VoiceRecorder({ onResult }) {
     audioContextRef.current = audioContext;
 
     const recorder = new Recorder(audioContext);
-    recorder.init(stream);
+    await recorder.init(stream);
     recorderRef.current = recorder;
 
     await recorder.start();
     setRecording(true);
+    setResponseData(null); // Clear previous response
   };
 
   const stopRecording = async () => {
@@ -39,6 +41,7 @@ function VoiceRecorder({ onResult }) {
       const response = await axios.post("http://127.0.0.1:8000/appointments/voice", formData, {
         headers: { "Content-Type": "multipart/form-data" }
       });
+      setResponseData(response.data);
       onResult && onResult(response.data);
     } catch (err) {
       console.error("Upload error:", err);
@@ -54,7 +57,11 @@ function VoiceRecorder({ onResult }) {
     <div className="container mt-5">
       <div className="card shadow border-0 p-4">
         <h4 className="text-center mb-4">🎤 Voice Appointment Form</h4>
-        
+
+        <div className="alert alert-info">
+          <strong>Try saying Like</strong> "My name is Ravi Kumar. I am 20 years old and I am suffering from fever."
+        </div>
+
         <div className="d-flex justify-content-center mb-3">
           <button
             onClick={startRecording}
@@ -77,6 +84,21 @@ function VoiceRecorder({ onResult }) {
           <div className="text-center mt-4">
             <p className="fw-bold">🔊 Preview:</p>
             <audio controls src={blobURL} className="w-100" />
+          </div>
+        )}
+
+        {responseData && (
+          <div className="alert alert-success mt-4">
+            <h5 className="fw-bold">🧾 Server Response:</h5>
+            <p><strong>Message:</strong> {responseData.message}</p>
+            <p><strong>Predicted Specialist:</strong> {responseData.predicted_specialist}</p>
+            <p><strong>Similarity Score:</strong> {responseData.similarity_score}</p>
+            <h6 className="mt-3">📄 Appointment Details:</h6>
+            <ul>
+              <li><strong>Name:</strong> {responseData.appointment?.patient_name}</li>
+              <li><strong>Age:</strong> {responseData.appointment?.age}</li>
+              <li><strong>Symptoms:</strong> {responseData.appointment?.symptoms}</li>
+            </ul>
           </div>
         )}
       </div>
