@@ -38,7 +38,7 @@ function VoiceRecorder({ onResult }) {
     formData.append("audio", blob, "recording.wav");
 
     try {
-      const response = await axios.post("http://127.0.0.1:8000/appointments/voice", formData, {
+      const response = await axios.post("http://localhost:8000/appointments/voice", formData, {
         headers: { "Content-Type": "multipart/form-data" }
       });
       setResponseData(response.data);

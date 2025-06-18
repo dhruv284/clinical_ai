@@ -7,7 +7,8 @@ import VoiceRecorder from './components/VoiceRecorder';
 import SignUp from './pages/SignUp';
 import Login from './pages/login';
 import Result from './pages/Result';
-
+import Appointments from "./pages/Appointments";
+import DoctorDashboard from './pages/DoctorDashboard';
 function App() {
   // Simple onResult handler
   const handleAppointmentResult = (data) => {
@@ -27,6 +28,10 @@ function App() {
           <Route path="/signup" element={<SignUp />} />
           <Route path="/login" element={<Login />} />
           <Route path="/result" element={<Result />} />
+          <Route path="/appointments" element={<Appointments />} />
+          <Route path="/doctor/dashboard" element={<DoctorDashboard doctorId={localStorage.getItem('userId')} />} />
+
+
         </Routes>
       </div>
     </Router>

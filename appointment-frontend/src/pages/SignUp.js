@@ -7,6 +7,8 @@ const Signup = () => {
     email: '',
     password: '',
     specialization: '',
+    work_start: '',
+    work_end: '',
   });
 
   const handleChange = (e) => {
@@ -31,19 +33,19 @@ const Signup = () => {
       <form onSubmit={handleSubmit}>
         <div className="mb-3">
           <label className="form-label">Full Name</label>
-          <input type="text" className="form-control" name="full_name" value={form.full_name} onChange={handleChange} />
+          <input type="text" className="form-control" name="full_name" value={form.full_name} onChange={handleChange} required />
         </div>
         <div className="mb-3">
           <label className="form-label">Email address</label>
-          <input type="email" className="form-control" name="email" value={form.email} onChange={handleChange} />
+          <input type="email" className="form-control" name="email" value={form.email} onChange={handleChange} required />
         </div>
         <div className="mb-3">
           <label className="form-label">Password</label>
-          <input type="password" className="form-control" name="password" value={form.password} onChange={handleChange} />
+          <input type="password" className="form-control" name="password" value={form.password} onChange={handleChange} required />
         </div>
         <div className="mb-3">
           <label className="form-label">Specialization</label>
-          <select className="form-select" name="specialization" value={form.specialization} onChange={handleChange}>
+          <select className="form-select" name="specialization" value={form.specialization} onChange={handleChange} required>
             <option value="">Select specialization</option>
             <option>Cardiologist</option>
             <option>Neurologist</option>
@@ -64,6 +66,14 @@ const Signup = () => {
             <option>Rheumatologist</option>
             <option>General physician</option>
           </select>
+        </div>
+        <div className="mb-3">
+          <label className="form-label">Work Start Time</label>
+          <input type="time" className="form-control" name="work_start" value={form.work_start} onChange={handleChange} required />
+        </div>
+        <div className="mb-3">
+          <label className="form-label">Work End Time</label>
+          <input type="time" className="form-control" name="work_end" value={form.work_end} onChange={handleChange} required />
         </div>
         <button type="submit" className="btn btn-success">Create Account</button>
       </form>

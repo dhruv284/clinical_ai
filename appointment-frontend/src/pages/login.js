@@ -10,26 +10,28 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const response = await fetch('http://127.0.0.1:8000/users/login', {
+  
+    const response = await fetch('http://localhost:8000/users/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ email, password }),
     });
-
+  
     if (response.ok) {
       const data = await response.json();
-      // Save token to localStorage or context
+  
       localStorage.setItem('token', data.access_token);
-      // Redirect
-      navigate('/dashboard'); // 👈 change path to wherever you want to redirect
+      localStorage.setItem('userId', data.user_id);  // Save for doctor-specific fetching
+      localStorage.setItem('user', JSON.stringify(data.user));
+      navigate('/doctor/dashboard'); // ✅ Always redirect to doctor dashboard
     } else {
       const errorData = await response.json();
       setError(errorData.detail || 'Login failed');
     }
   };
+  
 
   return (
     <div className="container mt-5">

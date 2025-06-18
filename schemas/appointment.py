@@ -1,14 +1,20 @@
-from fastapi import APIRouter
 from pydantic import BaseModel
+from datetime import date, time
+from typing import Optional
 
-router = APIRouter()
-class AppointmentInput(BaseModel):
+class AppointmentManual(BaseModel):
     patient_name: str
     age: int
     symptoms: str
     specialist: str
+    specialist_id: int
+    date: date
+    start_time: time
+    end_time: Optional[time] = None
+    status: Optional[str] = "pending"
 
-@router.post("/appointments/create")
-async def create_appointment(data: AppointmentInput):
-    print(f"Received appointment: {data}")
-    return {"message": "Appointment created", "data": data}
+class AppointmentAuto(BaseModel):
+    patient_name: str
+    age: int
+    symptoms: str
+

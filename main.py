@@ -11,7 +11,9 @@ app = FastAPI()
 # ✅ Enable CORS BEFORE including any routers
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # React frontend
+    allow_origins=["http://localhost:3000",
+                   "https://your-site-name.netlify.app",
+                   ],  # React frontend
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
