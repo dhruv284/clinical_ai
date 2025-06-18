@@ -122,11 +122,11 @@ const TextForm = ({ onResult }) => {
           specialist: form.specialization,
         };
         delete payload.specialization;
-
+    
         const res = await createAppointment(payload);
         onResult(res.data);
       }
-
+    
       setSuccess(true);
       setForm({
         patient_name: '',
@@ -142,9 +142,13 @@ const TextForm = ({ onResult }) => {
       setSlots([]);
     } catch (err) {
       console.error('Appointment creation failed:', err);
-      alert('❌ Appointment creation failed.');
+    
+      const errorMessage =
+        err?.response?.data?.detail || '❌ Appointment creation failed.';
+        
+      alert(errorMessage);
     }
-  };
+  };    
 
   const filteredDoctors = form.specialization
     ? specialists.filter((s) => s.specialization === form.specialization)

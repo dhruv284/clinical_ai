@@ -21,9 +21,10 @@ const Login = () => {
   
     if (response.ok) {
       const data = await response.json();
-  
+      console.log(data)
+      console.log(data.user.id)
       localStorage.setItem('token', data.access_token);
-      localStorage.setItem('userId', data.user_id);  // Save for doctor-specific fetching
+      localStorage.setItem('userId', data.user.id);  // Save for doctor-specific fetching
       localStorage.setItem('user', JSON.stringify(data.user));
       navigate('/doctor/dashboard'); // ✅ Always redirect to doctor dashboard
     } else {

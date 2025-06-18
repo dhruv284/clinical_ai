@@ -36,16 +36,23 @@ function VoiceRecorder({ onResult }) {
 
     const formData = new FormData();
     formData.append("audio", blob, "recording.wav");
-
     try {
       const response = await axios.post("http://localhost:8000/appointments/voice", formData, {
         headers: { "Content-Type": "multipart/form-data" }
       });
+    
       setResponseData(response.data);
-      onResult && onResult(response.data);
+      if (onResult) onResult(response.data);
+    
     } catch (err) {
       console.error("Upload error:", err);
-      alert("❌ Upload failed. WAV encoding might be invalid.");
+    
+      const errorMessage =
+        err.response?.data?.message || 
+        err.response?.data?.detail || 
+        "❌ Upload failed. WAV encoding might be invalid or server error.";
+    
+      alert(errorMessage);
     }
 
     // Clean up

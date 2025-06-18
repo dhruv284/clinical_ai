@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { fetchDoctorAppointments, updateAppointmentStatus } from "../api";
 
-const DoctorDashboard = ({ doctorId }) => {
+const DoctorDashboard = () => {
+  const navigate = useNavigate();
+  const [doctorId, setDoctorId] = useState(null);
   const [appointments, setAppointments] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -9,31 +12,47 @@ const DoctorDashboard = ({ doctorId }) => {
   const [filterStatus, setFilterStatus] = useState('');
   const [filterDate, setFilterDate] = useState('');
   const [doctorName, setDoctorName] = useState('');
+  const formatTime = (timeStr) => {
+    if (!timeStr) return '';
+    const [hour, minute] = timeStr.split(':');
+    const date = new Date();
+    date.setHours(hour, minute);
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const perPage = 5;
-  const totalPages = Math.ceil(filtered.length / perPage);
-  const paginatedData = filtered.slice((currentPage - 1) * perPage, currentPage * perPage);
 
-  const fetchData = async () => {
+  useEffect(() => {
+    const userId = localStorage.getItem('userId');
+    const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user'));
+
+    if (!userId || !token) {
+      navigate('/login');
+      return;
+    }
+
+    setDoctorId(userId);
+    if (user?.full_name) {
+      setDoctorName(user.full_name);
+    }
+
+    fetchData(userId);
+  }, []);
+
+  const fetchData = async (id) => {
     try {
-      const data = await fetchDoctorAppointments(doctorId);
+      const data = await fetchDoctorAppointments(id);
       setAppointments(data);
       setFiltered(data);
-      // If doctorName is in localStorage or API, set it here:
-      const user = JSON.parse(localStorage.getItem('user'));
-      if (user?.full_name) setDoctorName(user.full_name);
     } catch (error) {
       console.error("Error fetching appointments:", error);
     } finally {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    fetchData();
-  }, []);
 
   useEffect(() => {
     const lower = searchName.toLowerCase();
@@ -49,17 +68,20 @@ const DoctorDashboard = ({ doctorId }) => {
   const handleStatusUpdate = async (id, status) => {
     try {
       await updateAppointmentStatus(id, status);
-      fetchData(); // refresh list
+      fetchData(doctorId); // refresh list
     } catch (err) {
       console.error("Failed to update status:", err);
     }
   };
 
+  const totalPages = Math.ceil(filtered.length / perPage);
+  const paginatedData = filtered.slice((currentPage - 1) * perPage, currentPage * perPage);
+
   return (
     <div className="container mt-4">
       <h2>Welcome, Dr. {doctorName || "User"} 👨‍⚕️</h2>
       <hr />
-      
+
       <div className="row mb-3">
         <div className="col-md-3">
           <input
@@ -73,10 +95,8 @@ const DoctorDashboard = ({ doctorId }) => {
         <div className="col-md-3">
           <select className="form-select" value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
             <option value="">Filter by status</option>
-            
             <option value="confirmed">Confirmed</option>
             <option value="completed">Completed</option>
-            
           </select>
         </div>
         <div className="col-md-3">
@@ -116,7 +136,8 @@ const DoctorDashboard = ({ doctorId }) => {
                   <td>{a.age}</td>
                   <td>{a.symptoms}</td>
                   <td>{a.date}</td>
-                  <td>{a.start_time} - {a.end_time}</td>
+                  <td>{formatTime(a.start_time)} - {formatTime(a.end_time)}</td>
+
                   <td>{a.status}</td>
                   <td>
                     {a.status === "pending" && (

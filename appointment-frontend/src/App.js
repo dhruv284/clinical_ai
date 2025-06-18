@@ -29,7 +29,8 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/result" element={<Result />} />
           <Route path="/appointments" element={<Appointments />} />
-          <Route path="/doctor/dashboard" element={<DoctorDashboard doctorId={localStorage.getItem('userId')} />} />
+          <Route path="/doctor/dashboard" element={<DoctorDashboard />} />
+
 
 
         </Routes>

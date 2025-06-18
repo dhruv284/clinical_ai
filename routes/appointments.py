@@ -18,24 +18,39 @@ def get_db():
     finally:
         db.close()
 from sqlalchemy import func
+from datetime import datetime, timedelta
+from sqlalchemy import func
+from core.models.user import User
+from core.models.appointment import Appointment
+
+def round_up_to_next_slot(dt, slot_minutes=30):
+    """Round datetime up to next 30-min aligned slot"""
+    discard = timedelta(minutes=dt.minute % slot_minutes,
+                        seconds=dt.second,
+                        microseconds=dt.microsecond)
+    dt += timedelta(minutes=slot_minutes) - discard if discard.total_seconds() > 0 else timedelta()
+    return dt.replace(second=0, microsecond=0)
+
 def find_doctor_and_slot_today(specialization, duration_minutes, db):
     today = datetime.today().date()
     now = datetime.now()
+    aligned_now = round_up_to_next_slot(now)
 
-    
-
-    doctors = db.query(User).filter(func.lower(User.role) == 'specialist',func.lower(User.specialization) == specialization.lower()).all()
-
+    doctors = db.query(User).filter(
+        func.lower(User.role) == 'specialist',
+        func.lower(User.specialization) == specialization.lower()
+    ).all()
 
     for doc in doctors:
         start = datetime.combine(today, doc.work_start)
         end = datetime.combine(today, doc.work_end)
 
-        if now > end:
+        if aligned_now > end:
             continue
 
-        current = max(start, now)
+        current = max(start, aligned_now)
 
+        # Get all today's appointments for this doctor
         appointments = db.query(Appointment).filter_by(
             specialist_id=doc.id,
             date=today
@@ -45,11 +60,14 @@ def find_doctor_and_slot_today(specialization, duration_minutes, db):
             appt_start = datetime.combine(today, appt.start_time)
             appt_end = datetime.combine(today, appt.end_time)
 
+            # Check for free gap before this appointment
             if (appt_start - current).total_seconds() >= duration_minutes * 60:
                 return doc, current.time()
 
             current = max(current, appt_end)
+            current = round_up_to_next_slot(current)
 
+        # Check if there's free time after last appointment
         if (end - current).total_seconds() >= duration_minutes * 60:
             return doc, current.time()
 
@@ -69,6 +87,15 @@ async def create_appointment_from_voice(audio: UploadFile = File(...), db: Sessi
 
         specialist, score = predict_specialist(symptoms)
         print(specialist)
+        doctor_exists = db.query(User).filter(
+            func.lower(User.role) == 'specialist',
+            func.lower(User.specialization) == specialist.lower()
+        ).first()
+
+        if not doctor_exists:
+            return {
+                "message": f"Doctor specialization '{specialist}' is not registered. Please try different symptoms or contact admin."
+            }
         # Auto-book today only
         doc, slot = find_doctor_and_slot_today(specialist, 30, db)
         print(doc,slot)
@@ -187,46 +214,24 @@ async def create_appointment(data: AppointmentManual, db: Session = Depends(get_
     
 from fastapi import Query
 from datetime import datetime, date as date_type
+from utils.slot_utils import compute_available_slots
 @router.get("/doctors/{doctor_id}/slots")
-def get_available_slots(doctor_id: int, date_input, db: Session = Depends(get_db)):
+def get_available_slots(
+    doctor_id: int,
+    date: str = Query(...),
+    db: Session = Depends(get_db)):
     doctor = db.query(User).filter_by(id=doctor_id, role='specialist').first()
     if not doctor:
         raise HTTPException(status_code=404, detail="Doctor not found")
 
-    if isinstance(date_input, date_type):
-        appointment_date = date_input
-    elif isinstance(date_input, str):
-        try:
-            appointment_date = datetime.strptime(date_input, "%Y-%m-%d").date()
-        except ValueError:
-            raise HTTPException(status_code=400, detail="Invalid date format")
-    else:
-        raise HTTPException(status_code=400, detail="Invalid date value")
+    try:
+        appointment_date = datetime.strptime(date, "%Y-%m-%d").date()
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid date format")
 
-    # Generate all 30-minute slots in the doctor's working hours
-    start = datetime.combine(appointment_date, doctor.work_start)
-    end = datetime.combine(appointment_date, doctor.work_end)
+    slots = compute_available_slots(doctor, appointment_date, db)
+    return {"available_slots": slots}
 
-    all_slots = []
-    current = start
-    while current + timedelta(minutes=30) <= end:
-        all_slots.append(current.time().strftime("%H:%M"))
-        current += timedelta(minutes=30)
-
-    # Get booked slots
-    booked_appointments = db.query(Appointment).filter_by(
-        specialist_id=doctor.id,
-        date=appointment_date
-    ).all()
-
-    booked_times = set()
-    for appt in booked_appointments:
-        booked_times.add(appt.start_time.strftime("%H:%M"))
-
-    # Filter out booked slots
-    available_slots = [slot for slot in all_slots if slot not in booked_times]
-
-    return {"available_slots": available_slots}
 from schemas.appointment import AppointmentAuto
 from sqlalchemy import func
 @router.post("/appointments/auto")
@@ -239,18 +244,21 @@ def create_auto_appointment(data: AppointmentAuto, db: Session = Depends(get_db)
     
     doctors = db.query(User).filter(func.lower(User.specialization) == specialization.strip().lower()).all()
     if not doctors:
-        raise HTTPException(status_code=404, detail="No doctors available")
-
+        raise HTTPException(
+        status_code=404,
+        detail=f"Doctor specialization '{specialization}' is not registered. Please try again later or choose another category.")
     # Step 3: Check slots for each doctor
     today = datetime.now().date()
     for doctor in doctors:
         for offset in range(0, 7):  # check next 7 days
             check_date = today + timedelta(days=offset)
-            slots = get_available_slots(doctor.id, check_date, db)
-            if slots["available_slots"]:
+            
+            slots = compute_available_slots(doctor, check_date, db)
+            print(slots)
+            if slots:
                 # Step 4: Pick earliest available slot
                 print(slots)
-                start_time = datetime.strptime(slots["available_slots"][0], "%H:%M").time()
+                start_time = datetime.strptime(slots[0], "%H:%M").time()
                 end_time = (datetime.combine(date_type.today(), start_time) + timedelta(minutes=30)).time()
 
                 # Step 5: Book appointment
