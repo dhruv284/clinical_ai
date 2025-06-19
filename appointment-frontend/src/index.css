@@ -11,3 +11,183 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.navbar-nav .nav-link {
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.navbar-nav .nav-link:hover {
+  color: #0d6efd;
+  text-decoration: underline;
+}
+
+
+
+
+h2, h5 {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* index.css or App.css */
+
+/* Light Theme */
+body.light-theme {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+/* Dark Theme - Blue Variant */
+body.dark-theme {
+  background-color: #0a192f;
+  color: #ffffff;
+}
+
+/* General form elements */
+.dark-theme .card,
+.dark-theme .form-control,
+.dark-theme .form-select,
+.dark-theme input,
+.dark-theme select,
+.dark-theme textarea {
+  background-color: #112240;
+  color: #ffffff;
+  border-color: #233554;
+}
+
+/* Dropdown caret (Bootstrap) */
+.dark-theme .form-select {
+  background-image: url("data:image/svg+xml;charset=UTF8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3E%3Cpath fill='white' d='M2 0L0 2h4z'/%3E%3C/svg%3E");
+}
+
+/* Placeholder text */
+.dark-theme input::placeholder,
+.dark-theme textarea::placeholder {
+  color: #9aa4b2;
+}
+
+/* Labels */
+.dark-theme label {
+  color: #ffffff;
+}
+
+/* Toggle switch (Bootstrap form-switch) */
+.dark-theme .form-check-input {
+  background-color: #233554;
+  border-color: #465472;
+}
+.dark-theme .form-check-input:checked {
+  background-color: #2e8dd8;
+  border-color: #2e8dd8;
+}
+
+/* Buttons (optional dark variant) */
+.dark-theme .btn {
+  background-color: #2e8dd8;
+  border-color: #2e8dd8;
+  color: #ffffff;
+}
+.dark-theme .btn:hover {
+  background-color: #1b75c6;
+  border-color: #1b75c6;
+}
+
+/* Nav links */
+.dark-theme .nav-link {
+  color: #ffffff !important;
+}
+/* Toggle container */
+.dark-theme .bg-light {
+  background-color: #112240 !important;
+  color: white !important;
+}
+
+/* Form select dropdowns */
+.dark-theme select.form-select,
+.dark-theme .form-select {
+  background-color: #112240;
+  color: white;
+  border-color: #233554;
+}
+
+/* Date picker icon fix (Bootstrap/Chrome) */
+.dark-theme input[type="date"] {
+  background-color: #112240;
+  color: white;
+  border-color: #233554;
+}
+
+/* Button fix */
+.dark-theme .btn-success,
+.dark-theme .btn {
+  background-color: #2e8dd8;
+  border-color: #2e8dd8;
+  color: white;
+}
+
+.dark-theme .btn:hover {
+  background-color: #1b75c6;
+  border-color: #1b75c6;
+}
+
+/* Optional: Lighter border for inputs */
+.dark-theme .form-control,
+.dark-theme input,
+.dark-theme select {
+  border: 1px solid #2b3b55;
+}
+/* Table - dark theme */
+.dark-theme table {
+  background-color: #112240;
+  color: white;
+  border-color: #233554;
+}
+
+.dark-theme table th,
+.dark-theme table td {
+  background-color: #112240;
+  color: white;
+  border: 1px solid #233554;
+}
+
+.dark-theme table th {
+  font-weight: 600;
+}
+
+/* Optional: Table hover effect */
+.dark-theme table tbody tr:hover {
+  background-color: #1c2b3a;
+}
+body.dark-theme .pagination {
+  background-color: transparent;
+}
+
+body.dark-theme .pagination .page-item .page-link {
+  background-color: #233554;
+  color: #ffffff;
+  border: 1px solid #2e3b5e;
+  border-radius: 6px;
+  margin: 0 2px;
+  transition: all 0.2s;
+}
+
+body.dark-theme .pagination .page-item .page-link:hover {
+  background-color: #1c2b3a;
+  color: #fff;
+}
+
+body.dark-theme .pagination .page-item.active .page-link {
+  background-color: #1f6feb;
+  border-color: #1f6feb;
+  color: #ffffff;
+}
+
+body.dark-theme .pagination .page-item.disabled .page-link {
+  background-color: #2c3e50;
+  color: #aaa;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+body {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}

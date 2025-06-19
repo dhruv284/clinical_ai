@@ -156,21 +156,27 @@ const TextForm = ({ onResult }) => {
 
   return (
     <div className="container mt-4">
-      <div className="card shadow p-4">
+      <div className="card shadow-sm p-3 rounded-4 mx-auto" style={{ maxWidth: '550px' }}>
+
         <h4 className="mb-4 text-center">📝 Book Appointment</h4>
 
         {/* ✅ Auto booking toggle */}
-        <div className="form-check form-switch mb-4 text-center">
-          <input
-            className="form-check-input"
-            type="checkbox"
-            id="autoBook"
-            checked={autoMode}
-            onChange={() => setAutoMode(!autoMode)}
-          />
-          <label className="form-check-label" htmlFor="autoBook">
-            Use AI to auto-book doctor and time slot
-          </label>
+        <div className="mb-4 d-flex justify-content-center">
+          <div className="bg-light p-3 rounded-4 shadow-sm d-flex align-items-center gap-3" style={{ maxWidth: '500px', width: '100%' }}>
+            <div className="form-check form-switch m-0" style={{ transform: 'scale(1.5)' }}>
+              <input
+                className="form-check-input"
+                type="checkbox"
+                id="autoBook"
+                checked={autoMode}
+                onChange={() => setAutoMode(!autoMode)}
+                style={{ cursor: 'pointer' }}
+              />
+            </div>
+            <label className="form-check-label fw-semibold fs-5 mb-0" htmlFor="autoBook">
+              Use AI to auto-book doctor and time slot
+            </label>
+          </div>
         </div>
 
         <form onSubmit={handleSubmit}>

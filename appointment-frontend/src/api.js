@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API = axios.create({
-  baseURL: 'http://localhost:8000',  // ✅ change if you deploy elsewhere
+  baseURL: 'https://dhruv2842-clinic-ai-backend.hf.space',  // ✅ change if you deploy elsewhere
 });
 
 // 📤 Voice-based appointment (STT + booking)
